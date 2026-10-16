@@ -9,16 +9,22 @@ import argparse
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-sys.path.insert(0, str(ROOT))
+FROZEN = getattr(sys, "frozen", False)          # exécutable PyInstaller
+ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+if not FROZEN:
+    sys.path.insert(0, str(ROOT))
 
 
 def ensure_assets():
     from gui.assets import NAMES
-    if not all((ROOT / "assets" / f"{n}.png").exists() for n in NAMES):
-        print("Sprites manquants : génération des assets par défaut...")
-        from tools import generate_assets
-        generate_assets.main()
+    if all((ROOT / "assets" / f"{n}.png").exists() for n in NAMES):
+        return
+    if FROZEN:
+        print("Sprites manquants dans l'exécutable.")
+        return
+    print("Sprites manquants : génération des assets par défaut...")
+    from tools import generate_assets
+    generate_assets.main()
 
 
 def run_cli(level, algo):

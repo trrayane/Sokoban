@@ -4,3 +4,7 @@ settings.json
 .DS_Store
 Thumbs.db
 *.log
+build/
+dist/
+*.spec
+icon.ico

@@ -42,7 +42,20 @@
 
 ---
 
-## 🚀 Démarrage rapide
+## 🎮 Jouer sur Windows — sans rien installer
+
+> **[⬇ Télécharger `Sokoban.exe`](https://github.com/trrayane/Sokoban/releases/latest)** —
+> un seul fichier, **Python non requis**.
+>
+> 1. Téléchargez `Sokoban.exe` depuis la dernière release.
+> 2. Double-cliquez dessus — c'est tout. (Si Windows SmartScreen s'affiche :
+>    *Plus d'infos* → *Exécuter quand même*.)
+>
+> L'exécutable embarque le jeu complet (20 niveaux, sprites, sons, polices) —
+> vos options et votre progression sont sauvegardées dans `settings.json`
+> à côté du `.exe`.
+
+## 🚀 Démarrage rapide (source)
 
 ```bash
 git clone https://github.com/trrayane/Sokoban.git
@@ -291,6 +304,20 @@ licence SIL OFL, usage libre. Si les fichiers sont absents, le jeu bascule sur u
 
 Remplacez un fichier par le vôtre (même nom, `.wav` ou `.ogg`), ou régénérez les défauts :
 `python tools/generate_sounds.py`.
+
+---
+
+## 🛠️ Compiler son propre `.exe`
+
+```bash
+pip install pyinstaller pillow
+python build.py                   # -> dist/Sokoban.exe (fichier unique ~34 Mo)
+```
+
+`build.py` génère automatiquement l'icône (à partir du sprite du joueur), emballe
+`assets/` + `levels/` dans l'exécutable et sort un `Sokoban.exe` **windowed, autonome** :
+copiable sur n'importe quel PC Windows 10/11, aucune dépendance à installer.
+Les réglages (`settings.json`) s'écrivent à côté du `.exe`.
 
 ---
 
