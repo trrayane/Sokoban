@@ -308,8 +308,7 @@ Remplacez un fichier par le vôtre (même nom, `.wav` ou `.ogg`), ou régénére
 
 ## 🙏 Crédits
 
-- **Graphismes** — [2D Pixel Dungeon Asset Pack](https://penusbmic.itch.io/2d-pixel-dungeon-asset-pack)
-  (tileset, personnage, torches, drapeaux) · pixel art joueur remplaçable par vos exports Aseprite.
+- **Graphismes** — [2D Pixel Art]
 - **Polices** — *Press Start 2P* & *Silkscreen*, licences SIL Open Font License.
 - **Projet** — Sokoban, module *Problem Solving* — Master 1 Visual Computing, **USTHB**
   (encadrement : Dr. Meriem SEBAI). Année 2026/2027.
