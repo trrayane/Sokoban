@@ -78,8 +78,27 @@ class App:
 
     # ------------------------------------------------- navigation / options
     def apply_display(self):
-        flags = pygame.SCALED | pygame.FULLSCREEN if self.settings["fullscreen"] else 0
-        self.screen = pygame.display.set_mode((C.WIN_W, C.WIN_H), flags)
+        """(Ré)ouvre la fenêtre. SCALED garde une surface logique 1120x720
+        étirée à l'écran (la souris est traduite automatiquement).
+        Le plein écran passe par toggle_fullscreen : bien plus fiable que
+        FULLSCREEN|SCALED sur Windows (sinon écran noir / plantage).
+        Chaque étape a un repli : le jeu s'ouvre toujours, même sans GPU."""
+        size = (C.WIN_W, C.WIN_H)
+        try:
+            self.screen = pygame.display.set_mode(size, pygame.SCALED)
+            scaled = True
+        except pygame.error:
+            self.screen = pygame.display.set_mode(size)
+            scaled = False
+        if self.settings["fullscreen"]:
+            ok = scaled and pygame.display.toggle_fullscreen() == 0
+            if not ok:
+                for flags in (pygame.SCALED | pygame.FULLSCREEN, pygame.FULLSCREEN):
+                    try:
+                        self.screen = pygame.display.set_mode(size, flags)
+                        break
+                    except pygame.error:
+                        continue
 
     def make_background(self):
         """Fond décoratif : sol + murs du jeu, assombris."""
@@ -524,6 +543,8 @@ class App:
     def handle_event(self, e):
         if e.type == pygame.QUIT:
             self.running = False
+        elif e.type == pygame.KEYDOWN and e.key == pygame.K_F11:
+            self.toggle_fullscreen()
         elif self.scene == "game":
             self.handle_game_event(e)
         else:

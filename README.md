@@ -89,6 +89,7 @@ python tools/generate_sounds.py                   # régénère les sons par dé
 | **R** | recommencer le niveau |
 | **M** ou bouton **Machine** | choisir l'algorithme (BFS / DFS / A\*) ou comparer les 3 |
 | **N** ou bouton **Son** | son on / off (sauvegardé) |
+| **F11** ou Options → Plein écran | plein écran / fenêtre (repli automatique si le GPU refuse) |
 | **Espace** | lecture / pause de la simulation |
 | **[** **]** ou **PgUp / PgDn** | niveau précédent / suivant |
 | **+** / **−** | vitesse de simulation |

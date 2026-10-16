@@ -19,7 +19,7 @@ from gui.widgets import Button, draw_icon
 # >>> MODIFIEZ ICI vos crédits <<<
 CREDITS = [
     ("Projet", "Sokoban – Modélisation et résolution"),
-    ("Réalisé par", "Votre nom ici"),
+    ("Réalisé par", "Rayane Terki"),
     ("Module", "Problem Solving – Master 1 Visual Computing"),
     ("Encadrante", "Dr. Meriem SEBAI"),
     ("Université", "USTHB – 2026/2027"),
