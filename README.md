@@ -371,7 +371,6 @@ Les réglages (`settings.json`) s'écrivent à côté du `.exe`.
 - **Graphismes** — [2D Pixel Art]
 - **Polices** — *Press Start 2P* & *Silkscreen*, licences SIL Open Font License.
 - **Projet** — Sokoban, module *Problem Solving* — Master 1 Visual Computing, **USTHB**
-  (encadrement : Dr. Meriem SEBAI). Année 2026/2027.
 - **Code** — Python 3 & Pygame, sans autre dépendance.
 
 > Pensez à créditer l'auteur du pack si vous publiez une version : la licence du pack
