@@ -6,7 +6,10 @@ from core.node import Node
 from search.common import SearchResult, success
 
 
-def bfs(problem, prune_deadlocks=False, max_nodes=1_500_000):
+def bfs(problem, prune_deadlocks=True, max_nodes=1_500_000):
+    """BFS. prune_deadlocks élimine les états où une caisse est sur une case morte :
+    élagage admissible (aucune solution optimale n'est perdue) qui divise
+    l'espace par un facteur énorme sur les niveaux à 4+ caisses."""
     t0 = time.perf_counter()
     root = Node(problem)
     if root.state.isGoal():

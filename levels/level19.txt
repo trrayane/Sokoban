@@ -1,8 +1,8 @@
-OTOOPPOTOO
-O     S  O
-OS B     O
-O *ROOS  O
-T  BOO   T
-O B  B   O
-O    S   O
-OOOOOOOOOO
+OOOOOOOOTOO
+O         O
+OOBR O B PO
+O  B     ST
+P S     S T
+O         O
+OO   P   OO
+OOTTTOOTOOO

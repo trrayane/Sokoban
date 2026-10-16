@@ -91,7 +91,12 @@ class App:
             self.screen = pygame.display.set_mode(size)
             scaled = False
         if self.settings["fullscreen"]:
-            ok = scaled and pygame.display.toggle_fullscreen() == 0
+            ok = False
+            if scaled:
+                try:
+                    ok = pygame.display.toggle_fullscreen() == 0
+                except pygame.error:
+                    ok = False
             if not ok:
                 for flags in (pygame.SCALED | pygame.FULLSCREEN, pygame.FULLSCREEN):
                     try:
@@ -437,6 +442,8 @@ class App:
 
     # ------------------------------------------------------------ jeu manuel
     def try_move(self, action):
+        if self.is_won():                             # niveau réussi : plus de déplacement
+            return
         if self.path is not None:                   # on quitte la simulation
             self.path, self.actions, self.playing = None, None, False
             self.shown = None
@@ -501,12 +508,13 @@ class App:
                 self.held.remove(d)
         elif e.type == pygame.KEYDOWN:
             k = e.key
+            won = self.is_won()                       # après victoire : plus de déplacement
             if k == pygame.K_ESCAPE:
                 if self.machine_open:
                     self.machine_open = False
                 else:
                     self.go("levels")
-            elif k in self.MOVE_KEYS:
+            elif k in self.MOVE_KEYS and not won:
                 d = self.MOVE_KEYS[k]
                 self.held = [x for x in self.held if x != d] + [d]
                 if self.anim is None:
@@ -520,13 +528,13 @@ class App:
                     self.go("menu")
             elif k == pygame.K_r:
                 self.reset()
-            elif k in (pygame.K_u, pygame.K_BACKSPACE):
+            elif k in (pygame.K_u, pygame.K_BACKSPACE) and not won:
                 self.undo()
             elif k == pygame.K_n:
                 self.toggle_sound()
             elif k == pygame.K_m and not self.busy:
                 self.toggle_machine_menu()
-            elif k == pygame.K_SPACE:
+            elif k == pygame.K_SPACE and not won:
                 self.toggle_play()
             elif k in (pygame.K_PAGEUP, pygame.K_LEFTBRACKET):
                 self.load_level(self.level_idx - 1)
@@ -559,6 +567,8 @@ class App:
             return
         self.bump = max(0, getattr(self, "bump", 0) - dt)
         won = self.is_won()
+        if won and self.held:
+            self.held = []                            # plus de touches maintenues après victoire
         if won and not getattr(self, "_won_played", False):
             self.sound.play("win")
         self._won_played = won

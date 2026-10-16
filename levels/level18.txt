@@ -1,7 +1,8 @@
-OTOOOPPOTOO
-O  RS     O
-O BOOOOOB O
-O  OS ST  O
-O BOBOBO* O
-O  SS     O
-OOOOOOOOOOO
+OOOTOTOOOTO
+OO  O  O  T
+T         O
+TRB       O
+O B   S   O
+OOB O  O  T
+O S      ST
+OOOPOOTOOTO

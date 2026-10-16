@@ -6,7 +6,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Pygame](https://img.shields.io/badge/Pygame-2.5%2B-FFD43B?style=flat-square&logo=pygame&logoColor=black)
-![Levels](https://img.shields.io/badge/niveaux-20-EA4335?style=flat-square)
+![Levels](https://img.shields.io/badge/niveaux-30-EA4335?style=flat-square)
 ![Algorithms](https://img.shields.io/badge/BFS%20%C2%B7%20DFS%20%C2%B7%20A*%20-4285F4?style=flat-square)
 ![Status](https://img.shields.io/badge/statut-complet-brightgreen?style=flat-square)
 
@@ -27,8 +27,10 @@
   se rejouer** pas à pas (lecture / pause / pas à pas / vitesse variable).
 - 📊 **Tableau comparatif intégré** — coût, nœuds développés, nœuds générés et temps
   de mesure des 3 algorithmes, sur le même niveau.
-- 🗺️ **20 niveaux** — du tutoriel (1 caisse) aux cas difficiles où A\* déploie ~65 000 nœuds
-  et où BFS en développe ~800 000.
+- 🗺️ **30 niveaux** générés puis validés automatiquement — du tutoriel (1-2 caisses)
+  aux **niveaux Experts** (4-6 caisses) où A\* déploie plus de **400 000 nœuds**.
+  **Les 3 algorithmes (BFS, DFS, A\*) résolvent les 30 niveaux** — vérifié par
+  `python tools/make_levels.py --check`.
 - 🧩 **Éditeur de niveaux en texte** — un niveau = un fichier `.txt` dessiné avec des caractères,
   validé et testé en un `python tools/check_levels.py`.
 - 🎨 **Pixel art dungeon** — tileset *2D Pixel Dungeon Asset Pack*, torches animées, portes,
@@ -37,6 +39,10 @@
   tous remplaçables par vos fichiers.
 - 💾 **Options sauvegardées** — vitesse, algorithme par défaut, plein écran, son, progression
   (`settings.json`).
+- 🎉 **Victoire figée** — une fois le niveau réussi, le joueur **ne bouge plus** :
+  plus aucune touche de déplacement ni d'annulation, mais les boutons
+  **Niveau suivant**, **Accueil** et le mode **Machine** restent utilisables
+  (Entrée = niveau suivant).
 - 🧠 **Architecture « vraie IA »** — modélisation du problème découplée des algorithmes :
   on ajoute un algorithme en **une ligne**.
 
@@ -51,7 +57,7 @@
 > 2. Double-cliquez dessus — c'est tout. (Si Windows SmartScreen s'affiche :
 >    *Plus d'infos* → *Exécuter quand même*.)
 >
-> L'exécutable embarque le jeu complet (20 niveaux, sprites, sons, polices) —
+> L'exécutable embarque le jeu complet (30 niveaux, sprites, sons, polices) —
 > vos options et votre progression sont sauvegardées dans `settings.json`
 > à côté du `.exe`.
 
@@ -167,26 +173,30 @@ class SearchResult:
     time: float          # secondes
 ```
 
-### 📊 Benchmark (machine : Python 3.13, Pygame 2.6)
+### 📊 Benchmark réel (Python 3.13 — les 30 niveaux passent, 0 échec)
 
-| Niveau | Algorithme | Coût | Nœuds développés | Temps |
-|:--:|:--:|--:|--:|--:|
-| **1** (1 caisse) | BFS | 5 | 19 | 0.2 ms |
-| | DFS | 7 | 8 | 0.1 ms |
-| | **A\*** | **5** | **17** | 0.2 ms |
-| **3** (2 caisses) | BFS | 17 | 5 066 | 69 ms |
-| | DFS | 191 | 7 400 | 83 ms |
-| | **A\*** | **17** | **538** | **9.5 ms** |
-| **5** (3 caisses) | BFS | 39 | 80 391 | 574 ms |
-| | DFS | 89 | 60 702 | 384 ms |
-| | **A\*** | **39** | **13 483** | **164 ms** |
-| **10** (4 caisses) | BFS | 31 | 796 565 | 8.6 s |
-| | DFS | ✖ *limite* | 1 490 407 | 12.5 s |
-| | **A\*** | **31** | **65 261** | **1.1 s** |
+| Niveau | Caisses | Algorithme | Coût | Nœuds développés | Temps |
+|:--:|:--:|:--:|--:|--:|--:|
+| **1** (Apprenti) | 2 | BFS | 13 | 282 | 1 ms |
+| | | DFS | 23 | 124 | <1 ms |
+| | | **A\*** | **13** | **235** | 1 ms |
+| **9** (Apprenti) | 2 | BFS | 18 | 577 | 2 ms |
+| | | DFS | 154 | 4 495 | 19 ms |
+| | | **A\*** | **18** | **443** | 2 ms |
+| **23** (Expert) | 4 | BFS | 25 | 245 298 | 1.8 s |
+| | | DFS | 53 615 | 341 783 | 2.0 s |
+| | | **A\*** | **25** | **68 062** | **1.0 s** |
+| **29** (Expert) | 5 | BFS | 36 | 599 094 | 5.8 s |
+| | | DFS | 137 378 | 493 574 | 4.4 s |
+| | | **A\*** | **36** | **407 115** | 11.1 s |
 
-> **À retenir** — A\* résout le niveau 10 **13× moins de nœuds** que BFS et reste optimal,
-> là où DFS trouve une solution 3× plus longue (ou échoue sur les niveaux 18-20).
-> Reproduisez le benchmark : `python main.py --cli --level 10 --algo "A*"`.
+> **À retenir** — sur le niveau 29 (Expert, 5 caisses), BFS doit développer **600 000 nœuds**
+> là où A\* en développe 407 000 **et reste optimal**, tandis que DFS trouve une solution
+> 3 800× plus longue. Reproduisez : `python main.py --cli --level 29 --algo "A*"`.
+>
+> **Toutes les recherches élaguent les cases mortes** (une caisse sur case morte ne peut
+> plus jamais atteindre une cible) : élagage admissible qui ne perd aucune solution
+> optimale et fait passer BFS/DFS de « limite atteinte » à **30/30 niveaux résolus**.
 
 **Ajouter un algorithme en une ligne** (`search/__init__.py`) :
 
@@ -220,9 +230,9 @@ sokoban/
 │   ├── widgets.py / fonts.py  #   boutons, icônes, polices pixel
 │   ├── settings.py            #   sauvegarde options + progression
 │   └── constants.py           #   tailles, couleurs, vitesses
-├── levels/                    # 🗺️ 20 fichiers texte = 20 niveaux
+├── levels/                    # 🗺️ 30 niveaux (1-10 Apprenti, 11-20 Explorateur, 21-30 Expert)
 ├── assets/                    # 🎨 sprites, tileset, sons, polices
-├── tools/                     # ⚙️ génération & validation d'assets/niveaux
+├── tools/                     # ⚙️ générateur de niveaux, assets, sons, validation
 └── docs/                      # captures d'écran du README
 ```
 
@@ -253,17 +263,38 @@ OOOOOOOOOO
 | `T` | torche posée dans le mur (s'oriente toute seule) |
 | `P` | porte (`PP` = porte double) |
 
-**Créer un niveau en 4 étapes :**
+**Les 30 niveaux de la base** — tous générés puis **vérifiés par BFS + DFS + A\*** :
 
-1. Copiez un fichier existant : `copy levels\level10.txt levels\level11.txt`
+| Palier | Niveaux | Caisses | Difficulté humaine |Complexité IA (nœuds A\*) |
+|---|---|---|---|---|
+| 🟢 **Apprenti** | 1-10 | 1-2 | prise en main, poussées simples | < 2 000 |
+| 🟡 **Explorateur** | 11-20 | 3-4 | coordination de caisses, pièces séparées | 2 000 → 30 000 |
+| 🔴 **Expert** | 21-30 | 4-6 | séquences longues, casse-tête de haut niveau | 15 000 → **400 000+** |
+
+**Comment ils sont fabriqués** (`tools/make_levels.py`) : **reverse generation** —
+on part de l'état résolu (caisses déjà sur cibles) et on **tire les caisses à l'envers**
+(inverses exactes des poussées) pendant 15 à 100 coups, en rejetant tout coup qui place
+une caisse sur une **case morte**. Le niveau est donc **solvable par construction**,
+puis chaque niveau est filtré sur son nombre de nœuds A\*/BFS/DFS pour rentrer dans
+la tranche de son palier.
+
+```bash
+python tools/make_levels.py            # régénère les 30 niveaux (reproductible, seed fixe)
+python tools/make_levels.py --check    # audit BFS/DFS/A* de tous les niveaux
+python tools/make_levels.py --only 27  # régénère un seul niveau
+```
+
+**Créer un niveau à la main en 4 étapes :**
+
+1. Copiez un fichier existant : `copy levels\level10.txt levels\level31.txt`
 2. Dessinez-le (règles : zone entièrement close par des murs, **un seul `R`**,
    autant de `B` que de `S`).
 3. `python tools/check_levels.py` → validité **et** résolubles vérifiées par A\*.
 4. Relancez le jeu : le niveau apparaît automatiquement (ordre alphabétique).
 
-> Les niveaux 11 à 20 ont été générés « à l'envers » (construction depuis la solution)
-> puis revalidés par A\* — ils sont donc **garantis solvables**.
-> Conseils : commencez par 1 caisse, ajoutez-en une à la fois, et évitez les coins morts.
+> Astuce pour vos propres niveaux difficiles : gardez les caisses au milieu de la pièce
+> (pas collées aux murs) et obligez le joueur à faire des allers-retours — c'est ça,
+> un niveau dur pour un humain.
 
 ---
 
@@ -327,6 +358,7 @@ Les réglages (`settings.json`) s'écrivent à côté du `.exe`.
 | Commande | Rôle |
 |---|---|
 | `python tools/check_levels.py` | vérifie tous les fichiers de `levels/` (syntaxe, caisses = cibles, solvabilité A\*) |
+| `python tools/make_levels.py` | (ré)génère les 30 niveaux par reverse generation + audit BFS/DFS/A\* |
 | `python tools/generate_assets.py` | régénère les 13 sprites 16×16 par défaut |
 | `python tools/generate_sounds.py` | régénère les 8 sons `.wav` synthétiques |
 | `python tools/import_pack.py "<chemin>"` | importe/recoupe un asset pack via la table `MAPPING` |

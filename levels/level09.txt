@@ -1,6 +1,9 @@
-OOOOOOOOOOO
-O    O    O
-O B  O  S O
-O    B    O
-O S  O  R O
-OOOOOOOOOOO
+OOOOTOTOOO
+O        O
+T        O
+T     PS O
+OOOOO OOPO
+O *   OOOO
+T   BROOOO
+O     OOOO
+OOOOTPOOOO

@@ -48,7 +48,7 @@ def run_cli(level, algo):
 
 def main():
     ap = argparse.ArgumentParser(description="Sokoban – modélisation et résolution")
-    ap.add_argument("--level", type=int, default=None, help="lance directement ce niveau (1-20)")
+    ap.add_argument("--level", type=int, default=None, help="lance directement ce niveau (1-30)")
     ap.add_argument("--cli", action="store_true", help="mode console, sans interface")
     ap.add_argument("--algo", default="BFS", help="BFS, DFS ou A*")
     args = ap.parse_args()

@@ -1,7 +1,8 @@
-OOOOOOOO
-O      O
-O B  B O
-O      O
-O R    O
-O  S S O
-OOOOOOOO
+OOOTOTOPOTO
+T         O
+O       * O
+O         P
+O         T
+T B       O
+T R      SO
+OTTTOOOOOOO

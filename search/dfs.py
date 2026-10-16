@@ -5,7 +5,10 @@ from core.node import Node
 from search.common import SearchResult, success
 
 
-def dfs(problem, prune_deadlocks=False, max_nodes=1_500_000):
+def dfs(problem, prune_deadlocks=True, max_nodes=1_500_000):
+    """DFS. prune_deadlocks élimine les états où une caisse est sur une case morte :
+    élagage admissible (aucune solution n'est perdue car une caisse sur case
+    morte ne peut plus jamais rejoindre une cible)."""
     t0 = time.perf_counter()
     root = Node(problem)
     if root.state.isGoal():

@@ -1,7 +1,8 @@
-  OOOOOOO
-OOO     O
-O  B OB O
-O R  S  O
-O  OOB  O
-O S    SO
-OOOOOOOOO
+OPOOOOOO
+O POT  T
+O  S R O
+T    B P
+O  B  SO
+T      T
+O OTP  T
+OTOOOTPO
