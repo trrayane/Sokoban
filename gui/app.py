@@ -51,7 +51,9 @@ class App:
         self._fade_surf = pygame.Surface((C.WIN_W, C.WIN_H))
 
         self.algos = list(ALGORITHMS.keys())
-        self.algo = self.settings["algo"] if self.settings["algo"] in self.algos else self.algos[0]
+        saved = "A* h3" if self.settings["algo"] == "A*" else self.settings["algo"]
+        self.algo = saved if saved in self.algos else self.algos[0]
+        self.compare_algos = [n for n in self.algos if n != "A* best"]
         self.results = {}            # (index_niveau, algo) -> SearchResult
         self.busy = False
         self.busy_label = ""
@@ -348,13 +350,13 @@ class App:
         self._start_worker([self.algo], compare=False)
 
     def compare_all(self):
-        self._start_worker(self.algos, compare=True)
+        self._start_worker(self.compare_algos, compare=True)
 
     def _start_worker(self, algos, compare):
         if self.busy:
             return
         self.busy = True
-        self.busy_label = "Recherche en cours : " + ", ".join(algos)
+        self.busy_label = "Comparaison en cours" if compare else "Recherche en cours : " + algos[0]
         idx, problem = self.level_idx, self.initial
         if not compare:                    # on repart du début du niveau pour la simulation
             self.reset()
@@ -744,7 +746,7 @@ class App:
                 self.text(f"Nœuds développés : {res.expanded:,}", (box.x + 10, y))
 
         # tableau comparatif (seulement si la machine a déjà travaillé sur ce niveau)
-        if not any((self.level_idx, n) in self.results for n in self.algos):
+        if not any((self.level_idx, n) in self.results for n in self.compare_algos):
             self.text("Espace : lecture/pause   Échap : niveaux", (x, C.WIN_H - 28),
                       self.f_small, C.TEXT_DIM)
             return
@@ -757,7 +759,7 @@ class App:
         ty += 20
         pygame.draw.line(self.screen, C.PANEL_BORDER, (x, ty), (x + w, ty))
         ty += 6
-        for name in self.algos:
+        for name in self.compare_algos:
             r = self.results.get((self.level_idx, name))
             color = C.ACCENT if (r and r is self.shown) else C.TEXT
             if r is None:

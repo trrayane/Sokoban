@@ -47,14 +47,24 @@ def run_cli(level, algo):
 
 
 def main():
+    from search import ALGORITHMS
     ap = argparse.ArgumentParser(description="Sokoban – modélisation et résolution")
     ap.add_argument("--level", type=int, default=None, help="lance directement ce niveau (1-30)")
     ap.add_argument("--cli", action="store_true", help="mode console, sans interface")
-    ap.add_argument("--algo", default="BFS", help="BFS, DFS ou A*")
+    ap.add_argument("--algo", default="BFS", help="BFS, DFS, A* h1, A* h2, A* h3 ou A* best")
+    ap.add_argument("--heuristic", choices=("h1", "h2", "h3", "best"), default="h3",
+                    help="heuristique utilisée par A*")
     args = ap.parse_args()
 
+    if args.algo == "A*":
+        algo = "A* best" if args.heuristic == "best" else f"A* {args.heuristic}"
+    else:
+        algo = args.algo
+    if algo not in ALGORITHMS:
+        ap.error(f"algorithme inconnu : {algo}")
+
     if args.cli:
-        run_cli(args.level or 1, args.algo)
+        run_cli(args.level or 1, algo)
         return
     ensure_assets()
     from gui.app import App
