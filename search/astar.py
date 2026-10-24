@@ -33,7 +33,7 @@ class AStar:
 
     @staticmethod
     def _push_maps(layout):
-        maps = _PUSH_MAPS.get(layout)
+        maps = _PUSH_MAPS.get(layout) 
         if maps is not None:
             return maps
         maps = []
