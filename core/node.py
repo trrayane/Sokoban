@@ -7,6 +7,11 @@ class Node:
         self.parent = parent    # nœud parent
         self.action = action    # action appliquée au parent pour obtenir ce nœud
         self.g = g              # coût du chemin (coût d'un pas = 1)
+        self.f = None
+
+    def setF(self, h):
+        self.f = self.g + h
+        return self.f
 
     def getPath(self):
         """Liste des états, de l'état initial jusqu'à ce nœud."""

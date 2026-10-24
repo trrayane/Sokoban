@@ -1,4 +1,4 @@
-"""Recherche A* avec heuristique admissible (somme des distances caisse -> cible la plus proche)."""
+"""Recherche A* avec les heuristiques h1, h2 et h3."""
 import heapq
 import itertools
 import time
@@ -7,7 +7,15 @@ from core.node import Node
 from search.common import SearchResult, success
 
 
-def heuristic(state):
+def h1(state):
+    return len(state.boxes - state.layout.targets)
+
+
+def h2(state):
+    return 2 * h1(state) + h3(state)
+
+
+def h3(state):
     targets = state.layout.targets
     total = 0
     for (br, bc) in state.boxes:
@@ -17,11 +25,12 @@ def heuristic(state):
     return total
 
 
-def astar(problem, prune_deadlocks=True, max_nodes=1_500_000):
+def astar(problem, prune_deadlocks=True, max_nodes=1_500_000, heuristic=h3):
     t0 = time.perf_counter()
     root = Node(problem)
-    counter = itertools.count()                       # départage les égalités
-    frontier = [(heuristic(root.state), next(counter), root)]
+    root.setF(heuristic(root.state))
+    counter = itertools.count()
+    frontier = [(root.f, next(counter), root)]
     best_g = {root.state: 0}
     expanded, generated, max_front = 0, 1, 1
 
@@ -40,8 +49,9 @@ def astar(problem, prune_deadlocks=True, max_nodes=1_500_000):
             if g < best_g.get(state, float("inf")):
                 best_g[state] = g
                 child = Node(state, node, action, g)
+                child.setF(heuristic(state))
                 generated += 1
-                heapq.heappush(frontier, (g + heuristic(state), next(counter), child))
+                heapq.heappush(frontier, (child.f, next(counter), child))
         max_front = max(max_front, len(frontier))
         if generated > max_nodes:
             return SearchResult("A*", "limit", expanded=expanded, generated=generated,
