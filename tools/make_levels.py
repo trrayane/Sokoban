@@ -25,9 +25,9 @@ sys.path.insert(0, str(ROOT))
 
 from core.puzzle import ACTIONS, SokobanPuzzle, parse_level   # noqa: E402
 from search import ALGORITHMS                                 # noqa: E402
-from search.astar import astar                               # noqa: E402
-from search.bfs import bfs                                   # noqa: E402
-from search.dfs import dfs                                   # noqa: E402
+from search.astar import AStar                               # noqa: E402
+from search.bfs import BFS                                   # noqa: E402
+from search.dfs import DFS                                   # noqa: E402
 
 LEVEL_DIR = ROOT / "levels"
 SEED = 20261016
@@ -298,7 +298,7 @@ def evaluate(grid, band=None):
     # pendant la génération, on plafonne les nœuds pour rejeter vite les candidats trop durs
     cap = bool(band)
 
-    r = astar(p, max_nodes=min(1_500_000, int(a_max * 1.6) + 1000) if cap else 1_500_000)
+    r = AStar.search(p, max_nodes=min(1_500_000, int(a_max * 1.6) + 1000) if cap else 1_500_000)
     info["A*"] = {"status": r.status, "cost": r.cost, "exp": r.expanded,
                   "gen": r.generated, "t": r.time}
     if (r.status != "ok" or not (a_min <= r.expanded <= a_max)
@@ -306,14 +306,14 @@ def evaluate(grid, band=None):
         info.setdefault("why", "A* hors tranche")
         return False, info
 
-    r = bfs(p, max_nodes=min(1_500_000, int(b_max * 1.4) + 1000) if cap else 1_500_000)
+    r = BFS.search(p, max_nodes=min(1_500_000, int(b_max * 1.4) + 1000) if cap else 1_500_000)
     info["BFS"] = {"status": r.status, "cost": r.cost, "exp": r.expanded,
                    "gen": r.generated, "t": r.time}
     if r.status != "ok" or r.expanded > b_max:
         info.setdefault("why", "BFS trop gros")
         return False, info
 
-    r = dfs(p, max_nodes=1_000_000 if cap else 1_500_000)
+    r = DFS.search(p, max_nodes=1_000_000 if cap else 1_500_000)
     info["DFS"] = {"status": r.status, "cost": r.cost, "exp": r.expanded,
                    "gen": r.generated, "t": r.time}
     if r.status != "ok":

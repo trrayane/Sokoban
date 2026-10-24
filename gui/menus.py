@@ -496,8 +496,10 @@ class OptionsScreen(Screen):
         b.append(self.back_button("menu"))
         b.append(Button((X, Y0, 50, 44), "", lambda: app.set_speed(app.speed_idx - 1), icon="minus"))
         b.append(Button((X + 250, Y0, 50, 44), "", lambda: app.set_speed(app.speed_idx + 1), icon="plus"))
+        n = len(app.algos)
+        w = min(90, (C.WIN_W - 16 - X - (n - 1) * 6) // n)
         for i, name in enumerate(app.algos):
-            b.append(Button((X + i * 100, Y0 + S, 90, 44), name,
+            b.append(Button((X + i * (w + 6), Y0 + S, w, 44), name,
                             lambda n=name: app.set_default_algo(n),
                             active=lambda n=name: app.algo == n))
         b.append(Button((X, Y0 + 2 * S, 200, 44),
