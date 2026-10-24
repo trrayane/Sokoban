@@ -1,6 +1,5 @@
-from search.bfs import bfs
-from search.dfs import dfs
-from search.astar import astar
+from search.astar import AStar
+from search.bfs import BFS
+from search.dfs import DFS
 
-# Nom affiché -> fonction. Pour ajouter un algorithme : l'ajouter ici.
-ALGORITHMS = {"BFS": bfs, "DFS": dfs, "A*": astar}
+ALGORITHMS = {"BFS": BFS.search, "DFS": DFS.search, "A*": AStar.search}

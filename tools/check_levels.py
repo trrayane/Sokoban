@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from core.levels import LEVELS
 from core.puzzle import SokobanPuzzle
-from search import astar
+from search.astar import AStar
 
 
 def main():
@@ -22,7 +22,7 @@ def main():
         except ValueError as e:
             print(f"{lv['file']:14} FORMAT INVALIDE : {e}")
             continue
-        r = astar(p)
+        r = AStar.search(p)
         nb = len(p.boxes)
         if r.status == "ok":
             print(f"{lv['file']:14} OK   caisses={nb}  solution optimale={r.cost} pas  ({r.expanded} nœuds)")
