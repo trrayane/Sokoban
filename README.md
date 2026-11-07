@@ -131,8 +131,9 @@ class SokobanPuzzle:
   elle n'est jamais recopiée → gain mémoire et temps considérable sur les grands espaces.
 - **Codes du sujet** : `R` joueur · `O` mur · ` ` sol · `S` cible · `B` caisse
   · `.` joueur sur cible · `*` caisse sur cible.
-- **Bonus** : détection des *dead squares* (cases d'où une caisse ne peut plus jamais rejoindre
-  une cible) calculée par tirage inverse depuis les cibles → élagage et aide au niveau design.
+- **Bonus** : détection des *dead squares* (deadlocks de **coin** et de **ligne**) → élagage
+  et aide au niveau design. Les coins sont les cases bloquées par deux murs perpendiculaires ;
+  une ligne relie deux coins dont un côté est un mur continu.
 
 ```python
 from core.levels import LEVELS

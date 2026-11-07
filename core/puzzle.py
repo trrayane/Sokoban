@@ -34,25 +34,74 @@ class Layout:
         self.height = height
         self.width = width
         self.inside = frozenset(inside)          # cases jouables (intérieur)
-        self.dead_squares = self._compute_dead_squares()
+        # Deadlocks statiques (partie D du sujet) : coins puis lignes.
+        self.corner_deadlocks = self._compute_corner_deadlocks()
+        self.line_deadlocks = self._compute_line_deadlocks()
+        self.dead_squares = frozenset(
+            self.corner_deadlocks | self.line_deadlocks
+        )
         self.visible_walls = self._compute_visible_walls()
 
-    def _compute_dead_squares(self):
-        """Cases d'où une caisse ne pourra jamais atteindre une cible
-        (calcul par 'tirage' inverse depuis les cibles)."""
-        alive = set(self.targets)
-        stack = list(self.targets)
-        while stack:
-            p = stack.pop()
-            for dr, dc in ACTIONS.values():
-                q = (p[0] - dr, p[1] - dc)          # position précédente de la caisse
-                r = (p[0] - 2 * dr, p[1] - 2 * dc)  # position du joueur qui pousse
-                if q in self.walls or r in self.walls:
-                    continue
-                if q in self.inside and q not in alive:
-                    alive.add(q)
-                    stack.append(q)
-        return frozenset(self.inside - alive)
+    def _compute_corner_deadlocks(self):
+        """Cases non-cibles bloquées par deux murs perpendiculaires adjacents.
+
+        Une caisse dans un tel coin ne peut plus être poussée dans aucune
+        direction : les deux cases derrière elle sont des murs.
+        """
+        dead = set()
+        walls, targets = self.walls, self.targets
+        for r, c in self.inside:
+            if (r, c) in targets:
+                continue
+            vertical = (r - 1, c) in walls or (r + 1, c) in walls
+            horizontal = (r, c - 1) in walls or (r, c + 1) in walls
+            if vertical and horizontal:
+                dead.add((r, c))
+        return frozenset(dead)
+
+    def _compute_line_deadlocks(self):
+        """Relie deux coins par une ligne droite : si un côté de cette ligne
+        est entièrement mural, toutes ses cases non-cibles sont mortes.
+
+        Horizontalement, on relie deux coins d'une même ligne et on vérifie
+        que la rangée au-dessus ou en-dessous est un mur continu. Même
+        raisonnement verticalement avec les colonnes de gauche/droite.
+        """
+        dead = set()
+        rows, columns = {}, {}
+        for r, c in self.corner_deadlocks:
+            rows.setdefault(r, []).append(c)
+            columns.setdefault(c, []).append(r)
+
+        def mark(cells, side):
+            if all(p in self.walls for p in side):
+                dead.update(p for p in cells if p not in self.targets)
+
+        for r, cols in rows.items():
+            cols.sort()
+            for i, c1 in enumerate(cols):
+                for c2 in cols[i + 1:]:
+                    cells = [(r, c) for c in range(c1, c2 + 1)]
+                    if any(p not in self.inside for p in cells):
+                        continue
+                    if any(p in self.targets for p in cells):
+                        continue        # la caisse peut glisser vers cette cible
+                    mark(cells, [(r - 1, c) for c in range(c1, c2 + 1)])
+                    mark(cells, [(r + 1, c) for c in range(c1, c2 + 1)])
+
+        for c, lines in columns.items():
+            lines.sort()
+            for i, r1 in enumerate(lines):
+                for r2 in lines[i + 1:]:
+                    cells = [(r, c) for r in range(r1, r2 + 1)]
+                    if any(p not in self.inside for p in cells):
+                        continue
+                    if any(p in self.targets for p in cells):
+                        continue        # la caisse peut glisser vers cette cible
+                    mark(cells, [(r, c - 1) for r in range(r1, r2 + 1)])
+                    mark(cells, [(r, c + 1) for r in range(r1, r2 + 1)])
+
+        return frozenset(dead)
 
     def _compute_visible_walls(self):
         """Murs touchant l'intérieur (on n'affiche pas les murs 'décoratifs')."""
@@ -152,7 +201,7 @@ class SokobanPuzzle:
 
     # --- outils ---
     def is_deadlock(self):
-        """Vrai si une caisse est sur une case morte (jamais récupérable)."""
+        """Vrai si une caisse occupe une case de deadlock (coin ou ligne)."""
         return not self.boxes.isdisjoint(self.layout.dead_squares)
 
     def to_grid(self):
