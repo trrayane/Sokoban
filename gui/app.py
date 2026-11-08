@@ -54,6 +54,10 @@ class App:
         saved = "A* h3" if self.settings["algo"] == "A*" else self.settings["algo"]
         self.algo = saved if saved in self.algos else self.algos[0]
         self.compare_algos = [n for n in self.algos if n != "A* best"]
+        self.compare_keys = []       # lignes du tableau : "BFS", "BFS (sans)", ...
+        for n in self.compare_algos:
+            self.compare_keys.append(n)
+            self.compare_keys.append(f"{n} (sans)")
         self.results = {}            # (index_niveau, algo) -> SearchResult
         self.busy = False
         self.busy_label = ""
@@ -366,6 +370,11 @@ class App:
                 res = ALGORITHMS[name](problem)
                 with self.lock:
                     self.pending.append((idx, name, res, compare))
+                if compare:        # mêmes algos sans élagage des deadlocks,
+                    sau = ALGORITHMS[name](problem, prune_deadlocks=False,
+                                           max_nodes=200_000)   # budget réduit
+                    with self.lock:
+                        self.pending.append((idx, f"{name} (sans)", sau, compare))
             with self.lock:
                 self.pending.append(None)           # marqueur de fin
 
@@ -693,6 +702,15 @@ class App:
             self.screen.blit(txt, txt.get_rect(center=(bw // 2,
                                                       C.BOARD_H + 20 - 92)))
 
+    @staticmethod
+    def _fmt_nodes(n):
+        """Comptage compact pour la colonne 'Dév.' du tableau."""
+        if n < 100_000:
+            return f"{n:,}"
+        if n < 1_000_000:
+            return f"{n / 1e3:.0f} k"
+        return f"{n / 1e6:.2f} M"
+
     def text(self, s, pos, font=None, color=C.TEXT):
         img = (font or self.f_norm).render(s, True, color)
         self.screen.blit(img, pos)
@@ -746,33 +764,40 @@ class App:
                 self.text(f"Nœuds développés : {res.expanded:,}", (box.x + 10, y))
 
         # tableau comparatif (seulement si la machine a déjà travaillé sur ce niveau)
-        if not any((self.level_idx, n) in self.results for n in self.compare_algos):
+        if not any((self.level_idx, n) in self.results for n in self.compare_keys):
             self.text("Espace : lecture/pause   Échap : niveaux", (x, C.WIN_H - 28),
                       self.f_small, C.TEXT_DIM)
             return
         ty = box.bottom + 16
         self.text("Comparaison (niveau actuel)", (x, ty), self.f_bold)
         ty += 28
-        cols = [x, x + 62, x + 128, x + 220]
-        for cx, h in zip(cols, ["Algo", "Coût", "Étapes", "Temps"]):
+        cols = [x + 8, x + 128, x + 160, x + 226]
+        for cx, h in zip(cols, ["Algo", "Coût", "Dév.", "Temps"]):
             self.text(h, (cx, ty), self.f_small, C.TEXT_DIM)
         ty += 20
         pygame.draw.line(self.screen, C.PANEL_BORDER, (x, ty), (x + w, ty))
         ty += 6
-        for name in self.compare_algos:
+        for name in self.compare_keys:
             r = self.results.get((self.level_idx, name))
-            color = C.ACCENT if (r and r is self.shown) else C.TEXT
+            accent = r is not None and r is self.shown
+            if accent:
+                color = C.ACCENT
+            elif name.endswith(" (sans)"):
+                color = C.TEXT_DIM           # variante sans élagage : grisée
+            else:
+                color = C.TEXT
             if r is None:
                 row = [name, "-", "-", "-"]
             elif r.status != "ok":
-                row = [name, "échec", f"{r.expanded:,}", f"{r.time:.2f}s"]
+                row = [name, "échec", self._fmt_nodes(r.expanded), f"{r.time:.2f} s"]
             else:
-                row = [name, str(r.cost), f"{r.expanded:,}", f"{r.time * 1000:.0f} ms"]
+                row = [name, str(r.cost), self._fmt_nodes(r.expanded),
+                       f"{r.time * 1000:.0f} ms"]
             for cx, v in zip(cols, row):
                 self.text(v, (cx, ty), self.f_norm, color)
             ty += 24
-        self.text("Espace : lecture/pause   Échap : niveaux", (x, C.WIN_H - 28),
-                  self.f_small, C.TEXT_DIM)
+        self.text("Espace : lecture/pause   Échap : niveaux   (sans) = sans détection"
+                  " des deadlocks", (x, C.WIN_H - 28), self.f_small, C.TEXT_DIM)
 
     def draw_controls(self):
         """Fond de la barre de lecture + jauge de vitesse (mode machine)."""
